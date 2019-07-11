@@ -28,6 +28,11 @@ def main():
 
 	print("hello world")
 
+def crossover(parent1, parent2):
+	#in crossover, iterate through each room, select classes from each parent
+
+	return child
+
 #returns a fitness value, the closer to zero the more fit the gene
 def fitnessFunction(chromosome): 
 	fitness = 0
@@ -38,6 +43,20 @@ def fitnessFunction(chromosome):
 	fitness = fitness + slotsOnSameDay(chromosome) #(soft) adds to the fitness value for classes being schedules more than once per day
 	return fitness
 
+def sameRoomeSameTime(chromosome):
+	pass
+
+def classCapacityExceeded(chromosome):
+	pass
+
+def hoursAccurate(chromosome):
+	pass
+
+def repeatProf(chromosome):
+	pass
+
+def slotsOnSameDay(chromosome):
+	pass
 
 if __name__ == '__main__':
 	main()
