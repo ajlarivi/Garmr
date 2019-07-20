@@ -1,24 +1,50 @@
 import random
-
-from deap import base
-from deap import creator
-from deap import tools
+import sys
 
 
 class Lecture:
 	def __init__(self, id, prof, hours, size):
-		self.id = id
-		self.prof = prof
-		self.hours = hours
-		self.size = size
+		self.id = id #id of lecture
+		self.prof = prof # id of professor teaching the lecture
+		self.hours = hours #required hours per week
+		self.size = size #students registered in a lecture
 
 class Room:
-	def __init__(self, size):
+	def __init__(self, id, size):
+		self.id = id
 		self.size = size #capacity of the room
 		self.times = [] #array of time slots, each will contain a lecture object
 
 def main():
-	toolbox  = base.Toolbox
+	fileString = sys.argv[1]
+	inputFile = open(fileString, "r")
+	lectures = []
+	rooms = []
+	readingRooms = False
+
+	for line in inputFile:
+
+		if line == "rooms\n":
+			readingRooms = True
+			continue
+
+		line = line.strip("\n").split(",")
+
+		if not readingRooms:	
+			lectures.append(Lecture(int(line[0]),int(line[1]),int(line[2]),int(line[3])))
+		else:
+			rooms.append(Room(int(line[0]),int(line[1])))
+
+	print("Lectures")
+	for lecture in lectures:
+		print(str(lecture.id) + "," + str(lecture.prof) + "," + str(lecture.hours) + "," + str(lecture.size))
+	print("rooms")
+	for room in rooms:
+		print(str(room.id) + "," + str(room.size))
+
+
+
+
 	#step 1: generate a population of chromosomes, each is an array of rooms
 	#step 2: run genetic algorithm
 		#step 2.1: run fitness function on each chromosome
@@ -26,7 +52,6 @@ def main():
 		#step 2.3: repeat on offspring
 	#step 3: display result in human readable way (print out chromosome somehow)
 
-	print("hello world")
 
 def crossover(parent1, parent2):
 	#in crossover, iterate through each room, select classes from each parent
