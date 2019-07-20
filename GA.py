@@ -43,13 +43,23 @@ def main():
 		print(str(room.id) + "," + str(room.size))
 
 	rooms[0].times[0] = lectures[0]
+	rooms[0].times[1] = lectures[3]
 	rooms[1].times[1] = lectures[1]
+	rooms[1].times[27] = lectures[6]
 
 	parent1 = [rooms[0]]
 	parent2 = [rooms[1]]
 
 	testChild = crossover(parent1,parent2)
-	print(testChild[0].times)
+
+	for room in testChild:
+		for lecture in room.times:
+			if lecture is not None:
+				print(str(lecture.id) + ", ", end='')
+			else:
+				print("None, ", end='')
+		print()
+		print()
 
 
 
@@ -74,9 +84,18 @@ def crossover(parent1, parent2):
 			if parent1[i].times[j] is not None and parent2[i].times[j] is None:
 				childTimes[j] = parent1[i].times[j]
 
-		for k in range(len(parent2[i].times)):
-			if parent1[i].times[k] is None and parent2[i].times[k] is not None:
-				childTimes[j] = parent2[i].times[k]
+			if parent1[i].times[j] is None and parent2[i].times[j] is not None:
+				childTimes[j] = parent2[i].times[j]
+
+			if parent1[i].times[j] is not None and parent2[i].times[j] is not None:
+				chance = random.randint(1,100)
+				if chance <= 50:
+					childTimes[j] = parent1[i].times[j]
+				else:
+					childTimes[j] = parent2[i].times[j]
+
+
+				
 
 		childRoom = Room(parent1[i].id,parent1[i].size)
 		childRoom.times = childTimes
