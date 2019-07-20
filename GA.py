@@ -1,5 +1,6 @@
 import random
 import sys
+from datetime import datetime
 
 
 class Lecture:
@@ -47,8 +48,8 @@ def main():
 	rooms[1].times[1] = lectures[1]
 	rooms[1].times[27] = lectures[6]
 
-	parent1 = [rooms[0]]
-	parent2 = [rooms[1]]
+	parent1 = [rooms[0], rooms[1]]
+	parent2 = [rooms[1], rooms[0]]
 
 	testChild = crossover(parent1,parent2)
 
@@ -74,12 +75,11 @@ def main():
 
 def crossover(parent1, parent2):
 	#in crossover, iterate through each room, select classes from each parent
-
+	random.seed(datetime.now())
 	child = []
 
 	for i in range(len(parent1)):
 		childTimes = [None]*35
-
 		for j in range(len(parent1[i].times)):
 			if parent1[i].times[j] is not None and parent2[i].times[j] is None:
 				childTimes[j] = parent1[i].times[j]
@@ -88,6 +88,7 @@ def crossover(parent1, parent2):
 				childTimes[j] = parent2[i].times[j]
 
 			if parent1[i].times[j] is not None and parent2[i].times[j] is not None:
+				
 				chance = random.randint(1,100)
 				if chance <= 50:
 					childTimes[j] = parent1[i].times[j]
@@ -97,7 +98,7 @@ def crossover(parent1, parent2):
 
 				
 
-		childRoom = Room(parent1[i].id,parent1[i].size)
+		childRoom = parent1[i]
 		childRoom.times = childTimes
 
 		child.append(childRoom)
