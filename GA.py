@@ -37,7 +37,7 @@ def crossover(parent1, parent2):
 def fitnessFunction(chromosome): 
 	fitness = 0
 	fitness = fitness + sameRoomeSameTime(chromosome) #adds to the fitness value for classes scheduled in the same room at the same time
-	fitness = fitnesss + classCapacityExceeded(chromosome) #adds to the fitness value if a class is scheduled in a room that cant hold it
+	fitness = fitness + classCapacityExceeded(chromosome) #adds to the fitness value if a class is scheduled in a room that cant hold it
 	fitness = fitness + hoursAccurate(chromosome) #adds to the fitness value if a lecture has too many or too few in a week
 	fitness = fitness + repeatProf(chromosome) #(soft) adds to the fitness value for profs teaching in the same room two slots in a row
 	fitness = fitness + slotsOnSameDay(chromosome) #(soft) adds to the fitness value for classes being schedules more than once per day
@@ -47,7 +47,15 @@ def sameRoomeSameTime(chromosome):
 	pass
 
 def classCapacityExceeded(chromosome):
-	pass
+	int i = 0
+	int j = 0
+		
+	for i in range(len[chromsome]):
+		for j in range(len[chromsome[i].times]):
+			chromosome[i].size < chromosome[i].times[j].size
+			return 100000
+			
+	return 0	
 
 def hoursAccurate(chromosome):
 	pass
