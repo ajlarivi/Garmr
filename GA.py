@@ -42,7 +42,14 @@ def main():
 	for room in rooms:
 		print(str(room.id) + "," + str(room.size))
 
-	
+	rooms[0].times[0] = lectures[0]
+	rooms[1].times[1] = lectures[1]
+
+	parent1 = [rooms[0]]
+	parent2 = [rooms[1]]
+
+	testChild = crossover(parent1,parent2)
+	print(testChild[0].times)
 
 
 
@@ -71,12 +78,12 @@ def crossover(parent1, parent2):
 			if parent1[i].times[k] is None and parent2[i].times[k] is not None:
 				childTimes[j] = parent2[i].times[k]
 
-		childRoom = Room(parent1.id,parent1.size)
+		childRoom = Room(parent1[i].id,parent1[i].size)
 		childRoom.times = childTimes
 
 		child.append(childRoom)
 
-		print(child)
+		
 	return child
 
 #returns a fitness value, the closer to zero the more fit the gene
