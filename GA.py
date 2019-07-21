@@ -1,4 +1,6 @@
 import random
+import copy
+import math
 import sys
 from datetime import datetime
 
@@ -43,7 +45,7 @@ def main():
 	for room in rooms:
 		print(str(room.id) + "," + str(room.size))
 
-	geneticAlgorithm(lectures,rooms,10,300)
+	#geneticAlgorithm(lectures,rooms,10,300)
 
 	#step 1: generate a population of chromosomes, each is an array of rooms
 	#step 2: run genetic algorithm
@@ -81,9 +83,63 @@ def fitnessFunction(chromosome):
 	fitness = fitness + slotsOnSameDay(chromosome) #(soft) adds to the fitness value for classes being schedules more than once per day
 	return fitness
 
-#returns a list of tuples, each being a mating pair of chromosomes 
-def selection(population):
+def sameRoomeSameTime(chromosome):
 	pass
+
+def classCapacityExceeded(chromosome):
+	i = 0
+	j = 0
+		
+	for i in range(len([chromsome])):
+		for j in range(len([chromsome[i].times])):
+			if chromosome[i].size < chromosome[i].times[j].size:
+				return 100000
+			
+	return 0
+
+def hoursAccurate(chromosome):
+	pass
+
+def repeatProf(chromosome):
+	pass
+
+def slotsOnSameDay(chromosome):
+	pass
+
+#returns a list of tuples, each being a mating pair of chromosomes, chromosomes are more likely to be selected for mating the lower their fitness value is
+def selection(population):
+	popCopy = copy.deepCopy(population)
+	numPairs = int(math.ceil(len(popCopy)/4))
+	matingPairs = []
+
+	maxFitness = 0
+	for chromosome in popCopy:
+		if chromosome[0] > maxFitness:
+			maxFitness = chromosome[0]
+
+	for chromosome in popCopy:
+		chromosome.append(1 - chromosome[0]/maxFitness)
+
+	for i in range(numPairs):
+		chromosone1 = selectOne(popCopy)
+		popCopy.remove(chromosone1)
+		chromosome2 = selectOne(popCopy)
+		popCopy.remove(chromosome2)
+		matingPairs.append((chromosone1,chromosome2))
+
+	return matingPairs
+
+def selectOne(population):
+	maxRange = sum([chromosome[1] for chromosome in population])
+	pick = random.uniform(0, maxRange)
+	current = 0
+	for chromosome in population:
+		current += chromosome[1]
+		if current > pick:
+			return chromosome
+
+
+
 
 #returns a child of two parent chromosomes, by selectings schedulings from each parent and acdding them to the child
 def crossover(parent1, parent2):
@@ -117,31 +173,6 @@ def crossover(parent1, parent2):
 
 		
 	return child
-
-
-
-def sameRoomeSameTime(chromosome):
-	pass
-
-def classCapacityExceeded(chromosome):
-	int i = 0
-	int j = 0
-		
-	for i in range(len([chromsome])):
-		for j in range(len([chromsome[i].times])):
-			if chromosome[i].size < chromosome[i].times[j].size:
-				return 100000
-			
-	return 0
-
-def hoursAccurate(chromosome):
-	pass
-
-def repeatProf(chromosome):
-	pass
-
-def slotsOnSameDay(chromosome):
-	pass
 
 if __name__ == '__main__':
 	main()
