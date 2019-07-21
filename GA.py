@@ -43,28 +43,6 @@ def main():
 	for room in rooms:
 		print(str(room.id) + "," + str(room.size))
 
-	rooms[0].times[0] = lectures[0]
-	rooms[0].times[1] = lectures[3]
-	rooms[1].times[1] = lectures[1]
-	rooms[1].times[27] = lectures[6]
-
-	parent1 = [rooms[0], rooms[1]]
-	parent2 = [rooms[1], rooms[0]]
-
-	testChild = crossover(parent1,parent2)
-
-	for room in testChild:
-		for lecture in room.times:
-			if lecture is not None:
-				print(str(lecture.id) + ", ", end='')
-			else:
-				print("None, ", end='')
-		print()
-		print()
-
-
-
-
 	#step 1: generate a population of chromosomes, each is an array of rooms
 	#step 2: run genetic algorithm
 		#step 2.1: run fitness function on each chromosome
