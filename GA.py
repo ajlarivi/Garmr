@@ -98,7 +98,15 @@ def sameRoomeSameTime(chromosome):
 	pass
 
 def classCapacityExceeded(chromosome):
-	pass
+	int i = 0
+	int j = 0
+		
+	for i in range(len([chromsome])):
+		for j in range(len([chromsome[i].times])):
+			if chromosome[i].size < chromosome[i].times[j].size:
+				return 100000
+			
+	return 0
 
 def hoursAccurate(chromosome):
 	pass
