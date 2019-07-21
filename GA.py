@@ -54,10 +54,9 @@ def main():
 
 def geneticAlgorithm(lectures, rooms, popSize, iterations):
 	random.seed(datetime.now())
-	counter = 0
 	population = initPopulation(rooms, lectures, popSize)
 
-	while counter < iterations:
+	for i in range(iterations):
 		population = random.shuffle(population)
 
 		for chromosome in population:
@@ -69,7 +68,6 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 
 		population.sort(key=lambda x: x[0], reverse=False)
 		population = population[:popSize]
-		counter = counter + 1
 			
 	return population[0]
 
