@@ -14,7 +14,7 @@ class Room:
 	def __init__(self, id, size):
 		self.id = id
 		self.size = size #capacity of the room
-		self.times = [None]*35 #array of time slots, each will contain a lecture object
+		self.times = [None]*36 #array of time slots, each will contain a lecture object
 
 def main():
 	fileString = sys.argv[1]
@@ -43,6 +43,8 @@ def main():
 	for room in rooms:
 		print(str(room.id) + "," + str(room.size))
 
+	geneticAlgorithm(lectures,rooms,10,300)
+
 	#step 1: generate a population of chromosomes, each is an array of rooms
 	#step 2: run genetic algorithm
 		#step 2.1: run fitness function on each chromosome
@@ -50,9 +52,43 @@ def main():
 		#step 2.3: repeat on offspring
 	#step 3: display result in human readable way (print out chromosome somehow)
 
+def geneticAlgorithm(lectures, rooms, popSize, iterations):
+	random.seed(datetime.now())
+	counter = 0
+	population = initPopulation(rooms, lectures, popSize)
 
+	while counter < iterations:
+
+		for chromosome in population:
+			chromosome[0] = fitnessFunction(chromosome)
+
+		selected = selection(population)
+		for pair in selected:
+			population.append(crossover(pair[0], pair[1]))
+
+		population.sort(key=lambda x: x[0], reverse=False)
+		population = population[:popSize]
+		population = random.shuffle(population)
+			
+	population.sort(key=lambda x: x[0], reverse=False)
+	return population[0]
+
+#returns a fitness value, the closer to zero the more fit the chromosome
+def fitnessFunction(chromosome): 
+	fitness = 0
+	fitness = fitness + sameRoomeSameTime(chromosome) #adds to the fitness value for classes scheduled in the same room at the same time
+	fitness = fitnesss + classCapacityExceeded(chromosome) #adds to the fitness value if a class is scheduled in a room that cant hold it
+	fitness = fitness + hoursAccurate(chromosome) #adds to the fitness value if a lecture has too many or too few in a week
+	fitness = fitness + repeatProf(chromosome) #(soft) adds to the fitness value for profs teaching in the same room two slots in a row
+	fitness = fitness + slotsOnSameDay(chromosome) #(soft) adds to the fitness value for classes being schedules more than once per day
+	return fitness
+
+#returns a list of tuples, each being a mating pair of chromosomes 
+def selection(population):
+	pass
+
+#returns a child of two parent chromosomes, by selectings schedulings from each parent and acdding them to the child
 def crossover(parent1, parent2):
-	#in crossover, iterate through each room, select classes from each parent
 	random.seed(datetime.now())
 	child = []
 
@@ -84,15 +120,7 @@ def crossover(parent1, parent2):
 		
 	return child
 
-#returns a fitness value, the closer to zero the more fit the gene
-def fitnessFunction(chromosome): 
-	fitness = 0
-	fitness = fitness + sameRoomeSameTime(chromosome) #adds to the fitness value for classes scheduled in the same room at the same time
-	fitness = fitnesss + classCapacityExceeded(chromosome) #adds to the fitness value if a class is scheduled in a room that cant hold it
-	fitness = fitness + hoursAccurate(chromosome) #adds to the fitness value if a lecture has too many or too few in a week
-	fitness = fitness + repeatProf(chromosome) #(soft) adds to the fitness value for profs teaching in the same room two slots in a row
-	fitness = fitness + slotsOnSameDay(chromosome) #(soft) adds to the fitness value for classes being schedules more than once per day
-	return fitness
+
 
 def sameRoomeSameTime(chromosome):
 	pass
