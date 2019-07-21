@@ -59,7 +59,7 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 
 	while counter < iterations:
 		population = random.shuffle(population)
-		
+
 		for chromosome in population:
 			chromosome[0] = fitnessFunction(chromosome)
 
@@ -69,6 +69,7 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 
 		population.sort(key=lambda x: x[0], reverse=False)
 		population = population[:popSize]
+		counter = counter + 1
 			
 	return population[0]
 
