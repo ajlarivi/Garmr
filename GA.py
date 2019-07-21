@@ -70,7 +70,8 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 		population = population[:popSize]
 		population = random.shuffle(population)
 			
-
+	population.sort(key=lambda x: x[0], reverse=False)
+	return population[0]
 
 #returns a fitness value, the closer to zero the more fit the chromosome
 def fitnessFunction(chromosome): 
