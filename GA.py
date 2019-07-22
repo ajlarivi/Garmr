@@ -76,19 +76,31 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 #returns a fitness value, the closer to zero the more fit the chromosome
 def fitnessFunction(chromosome): 
 	fitness = 0
-	fitness = fitness + sameRoomeSameTime(chromosome) #adds to the fitness value for classes scheduled in the same room at the same time
+	fitness = fitness + duplicateLecture(chromosome) #adds to the fitness value for classes scheduled in the same room at the same time
 	fitness = fitnesss + classCapacityExceeded(chromosome) #adds to the fitness value if a class is scheduled in a room that cant hold it
 	fitness = fitness + hoursAccurate(chromosome) #adds to the fitness value if a lecture has too many or too few in a week
 	fitness = fitness + repeatProf(chromosome) #(soft) adds to the fitness value for profs teaching in the same room two slots in a row
 	fitness = fitness + slotsOnSameDay(chromosome) #(soft) adds to the fitness value for classes being schedules more than once per day
 	return fitness
 
-def sameRoomeSameTime(chromosome):
-	pass
+def duplicateLecture(chromosome):
+	private int i = 0
+	private int j = 0
+	private int k = 0
+		
+	for j in range(len([chromsome].times])):
+		i = 0
+		for i in range(len([chromsome])):
+			k = i + 1
+			for k in range(len([chromosome])):
+				if ((chromosome[i].times[j].id = chromosome[k].times[j].size)&&(i!=k)):
+					return 100000
+			
+	return 0
 
 def classCapacityExceeded(chromosome):
-	i = 0
-	j = 0
+	private int i = 0
+	private int j = 0
 		
 	for i in range(len([chromsome])):
 		for j in range(len([chromsome[i].times])):
