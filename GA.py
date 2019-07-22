@@ -18,31 +18,56 @@ class Room:
 		self.size = size #capacity of the room
 		self.times = [None]*36 #array of time slots, each will contain a lecture object
 
+def getRandom(list):
+	random.seed(datetime.now()) #seed random to avoid a pattern
+	return random.randint(0, len(list) - 1)
+
+def getNextFreeTime(room):
+	randTime = getRandom(room.times)
+
+	while room.times[randTime] is not None: #if slot value is not none there is a collision
+		if randTime == len(room.times) - 1: #wrap back to 0 once we hit max lecture hour
+			randTime = 0
+		else: #otherwise, just increment by 1
+			randTime += 1
+	return randTime
+
 def initPopulation(rooms, lectures, popSize):
 	numLectures = len(lectures)
-	population = []
+	population = [0] #first element of chromsome is fitness value
 
-	while len(population) < popSize:
-		tempRooms = copy.deepcopy(rooms)
+	while len(population) <= popSize: #use <= since the first element is not a chromosome
+		tempRooms = copy.deepcopy(rooms) #gotta deep copy to avoid weird Python referencing issues
 		tempLectures = copy.deepcopy(lectures)
-		random.seed(datetime.now())
-		while len(tempLectures) > 0:
-			randRoom = random.randint(0, len(tempRooms) - 1)
-			randLecNum = random.randint(0, len(tempLectures) - 1)
-			randLec = tempLectures[randLecNum]
-			del tempLectures[randLecNum]
-			tempRooms[randRoom].times.append(randLec)
-		population.append(tempRooms)
+
+		while len(tempLectures) > 0: #run for total number of lectures
+			randLecNum = getRandom(tempLectures)
+			randLec = tempLectures[randLecNum] #pick random lecture from list to assign
+			del tempLectures[randLecNum] #remove randomly chosen lecture from the running
+
+			for i in range(randLec.hours): #have to add enough slots to cover required lecture hours
+				randRoom = getRandom(tempRooms) #pick random room to put lecture in
+				timeSlot = getNextFreeTime(tempRooms[randRoom])
+				tempRooms[randRoom].times[timeSlot] = randLec #add chosen lecture to random time slot
+
+		population.append(tempRooms) #tack new chromosome onto the end of the population list
+
 	return population
 
 def printPopulation(population):
-	for x in range(len(population)):
-		print("Chromosome number " + str(x + 1))
-		for y in range(len(population[x])):
-			print("Room number " + str(population[x][y].id))
-			for z in range(len(population[x][y].times)):
-				print(population[x][y].times[z].id)
+	for chromosome in range(1, len(population)): #all chromosomes
+		print("Chromosome number " + str(chromosome))
 
+		for room in range(len(population[chromosome])):
+			print("Room number " + str(population[chromosome][room].id))
+
+			for time in range(len(population[chromosome][room].times)):
+				if population[chromosome][room].times[time] is not None:
+					print("Time slot number " + str(time) + ": " + str(population[chromosome][room].times[time].id)) #big fan of this chaining
+				# else:
+				# 	print("Time slot number " + str(time) + ": " + "No lecture")
+			print("\n")
+		print("\n")
 def main():
 	fileString = sys.argv[1]
 	inputFile = open(fileString, "r")
@@ -63,12 +88,15 @@ def main():
 		else:
 			rooms.append(Room(int(line[0]),int(line[1])))
 
-	print("Lectures")
-	for lecture in lectures:
-		print(str(lecture.id) + "," + str(lecture.prof) + "," + str(lecture.hours) + "," + str(lecture.size))
-	print("rooms")
-	for room in rooms:
-		print(str(room.id) + "," + str(room.size))
+	# print("Lectures")
+	# for lecture in lectures:
+	# 	print(str(lecture.id) + "," + str(lecture.prof) + "," + str(lecture.hours) + "," + str(lecture.size))
+	# print("rooms")
+	# for room in rooms:
+	# 	print(str(room.id) + "," + str(room.size))
+
+	basePop = initPopulation(rooms, lectures, 2)
+	printPopulation(basePop)
 
 	#geneticAlgorithm(lectures,rooms,10,300)
 
@@ -162,9 +190,6 @@ def selectOne(population):
 		current += chromosome[1]
 		if current > pick:
 			return chromosome
-
-
-
 
 #returns a child of two parent chromosomes, by selectings schedulings from each parent and acdding them to the child
 def crossover(parent1, parent2):
