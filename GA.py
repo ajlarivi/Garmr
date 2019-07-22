@@ -93,7 +93,7 @@ def duplicateLecture(chromosome):
 		for i in range(len([chromsome])):
 			k = i + 1
 			for k in range(len([chromosome])):
-				if ((chromosome[i].times[j].id = chromosome[k].times[j].size)&&(i!=k)):
+				if ((chromosome[i].times[j].id = chromosome[k].times[j].size)and(i!=k)):
 					return 100000
 			
 	return 0
