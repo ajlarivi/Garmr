@@ -93,7 +93,7 @@ def duplicateLecture(chromosome):
 		for i in range(len([chromsome])):
 			k = i + 1
 			for k in range(len([chromosome])):
-				if ((chromosome[i].times[j].id = chromosome[k].times[j].size)and(i!=k)):
+				if ((chromosome[i].times[j].id = chromosome[k].times[j].id)and(i!=k)):
 					return 100000
 			
 	return 0
@@ -113,7 +113,20 @@ def hoursAccurate(chromosome):
 	pass
 
 def repeatProf(chromosome):
-	pass
+	private int h = 0
+	private int i = 0
+	private int j = 0
+	private int k = 0
+	private int x = 0
+		
+	for i in range(len([chromsome])):
+		for h in range(len([chromsome])):
+			for j in range(len([chromosome[i])):
+				k = j + 1
+				if ((chromosome[i].times[j].prof = chromosome[h].times[k].prof)):
+					x = x + 100
+			
+	return x
 
 def slotsOnSameDay(chromosome):
 	pass
