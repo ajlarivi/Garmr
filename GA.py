@@ -121,9 +121,11 @@ def repeatProf(chromosome):
 		
 	for i in range(len([chromsome])):
 		for h in range(len([chromsome])):
-			for j in range(len([chromosome[i])):
+			for j in range(len([chromosome[i].times)):
 				k = j + 1
-				if ((chromosome[i].times[j].prof = chromosome[h].times[k].prof)):
+				if (k > len([chromsome[i].times)):
+					     k = k - 1
+				if ((chromosome[i].times[j].prof = chromosome[h].times[k].prof)and( j!=k)):
 					x = x + 100
 			
 	return x
