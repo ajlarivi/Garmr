@@ -76,60 +76,65 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 #returns a fitness value, the closer to zero the more fit the chromosome
 def fitnessFunction(chromosome): 
 	fitness = 0
-	fitness = fitness + duplicateLecture(chromosome) #adds to the fitness value for classes scheduled in the same room at the same time
-	fitness = fitnesss + classCapacityExceeded(chromosome) #adds to the fitness value if a class is scheduled in a room that cant hold it
-	fitness = fitness + hoursAccurate(chromosome) #adds to the fitness value if a lecture has too many or too few in a week
-	fitness = fitness + repeatProf(chromosome) #(soft) adds to the fitness value for profs teaching in the same room two slots in a row
-	fitness = fitness + slotsOnSameDay(chromosome) #(soft) adds to the fitness value for classes being schedules more than once per day
+	fitness = fitness + duplicateLecture(chromosome) 
+	fitness = fitnesss + classCapacityExceeded(chromosome) 
+	fitness = fitness + hoursAccurate(chromosome) 
+	fitness = fitness + repeatProf(chromosome) 
+	fitness = fitness + slotsOnSameDay(chromosome) 
 	return fitness
 
+#adds to the fitness value for classes scheduled in the same room at the same time
 def duplicateLecture(chromosome):
-	private int i = 0
-	private int j = 0
-	private int k = 0
+	i = 0
+	j = 0
+	k = 0
 		
-	for j in range(len([chromsome].times])):
+	for j in range(len(chromsome.times)):
 		i = 0
-		for i in range(len([chromsome])):
+		for i in range(len(chromsome)):
 			k = i + 1
-			for k in range(len([chromosome])):
-				if ((chromosome[i].times[j].id = chromosome[k].times[j].id)and(i!=k)):
+			for k in range(len(chromosome)):
+				if chromosome[i].times[j].id == chromosome[k].times[j].id and i != k:
 					return 100000
 			
 	return 0
 
+#adds to the fitness value if a class is scheduled in a room that cant hold it
 def classCapacityExceeded(chromosome):
-	private int i = 0
-	private int j = 0
+	i = 0
+	j = 0
 		
-	for i in range(len([chromsome])):
-		for j in range(len([chromsome[i].times])):
+	for i in range(len(chromsome)):
+		for j in range(len(chromsome[i].times)):
 			if chromosome[i].size < chromosome[i].times[j].size:
 				return 100000
 			
 	return 0
 
+#adds to the fitness value if a lecture has too many or too few in a week
 def hoursAccurate(chromosome):
 	pass
 
+#(soft) adds to the fitness value for profs teaching in the same room two slots in a row
 def repeatProf(chromosome):
-	private int h = 0
-	private int i = 0
-	private int j = 0
-	private int k = 0
-	private int x = 0
+	h = 0
+	i = 0
+	j = 0
+	k = 0
+	x = 0
 		
-	for i in range(len([chromsome])):
-		for h in range(len([chromsome])):
-			for j in range(len([chromosome[i].times)):
+	for i in range(len(chromsome)):
+		for h in range(len(chromsome)):
+			for j in range(len(chromosome[i].times)):
 				k = j + 1
-				if (k > len([chromsome[i].times)):
+				if k > len(chromsome[i].times):
 					     k = k - 1
-				if ((chromosome[i].times[j].prof = chromosome[h].times[k].prof)and( j!=k)):
+				if chromosome[i].times[j].prof == chromosome[h].times[k].prof and j != k:
 					x = x + 100
 			
 	return x
 
+#(soft) adds to the fitness value for classes being schedules more than once per day
 def slotsOnSameDay(chromosome):
 	pass
 
