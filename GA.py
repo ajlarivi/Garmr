@@ -47,9 +47,9 @@ def main():
 		print(str(room.id) + "," + str(room.size))
 
 	rooms[4].times = [None,None,lectures[0],lectures[1],lectures[2]]
-	rooms[2].times = [None, lectures[0], None, lectures[0], lectures[6]]
+	rooms[2].times = [None, lectures[0], None, lectures[0], lectures[0]]
 	chromosome = [rooms[4],rooms[2]]
-	print(classCapacityExceeded(chromosome))
+	print(repeatProf(chromosome))
 
 
 	#geneticAlgorithm(lectures,rooms,10,300)
@@ -125,19 +125,12 @@ def hoursAccurate(chromosome):
 
 #(soft) adds to the fitness value for profs teaching in the same room two slots in a row
 def repeatProf(chromosome):
-	h = 0
-	i = 0
-	j = 0
-	k = 0
 	addFitness = 0
 		
-	for i in range(len(chromsome)):
-		for h in range(len(chromsome)):
-			for j in range(len(chromosome[i].times)):
-				k = j + 1
-				if k > len(chromsome[i].times):
-					     k = k - 1
-				if chromosome[i].times[j].prof == chromosome[h].times[k].prof and j != k:
+	for room in chromosome:
+		for i,j in enumerate(range(1,len(room.times))):
+			if room.times[i] is not None and room.times[j] is not None:
+				if room.times[i].prof == room.times[j].prof:
 					addFitness = addFitness + 100
 			
 	return addFitness
