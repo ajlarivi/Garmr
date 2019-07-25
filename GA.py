@@ -46,11 +46,11 @@ def main():
 	for room in rooms:
 		print(str(room.id) + "," + str(room.size))
 
-	rooms[4].times = [lectures[1],lectures[1],lectures[0],lectures[1],lectures[2]]
-	rooms[2].times = [None, lectures[0], None, lectures[0], lectures[0]]
+	rooms[4].times = [lectures[1],lectures[1],lectures[6],lectures[5],lectures[2]]
+	rooms[2].times = [None, lectures[2], None, lectures[1], lectures[6]]
 	chromosome = [rooms[4],rooms[2]]
 	testLectures = [lectures[0], lectures[1], lectures[2]]
-	print(hoursAccurate(chromosome,testLectures))
+	print(slotsOnSameDay(chromosome))
 
 
 	#geneticAlgorithm(lectures,rooms,10,300)
@@ -100,8 +100,8 @@ def duplicateLecture(chromosome):
 		for room in chromosome:
 			if room.times[i] is not None:
 				notNone.append(room.times[i].id)
+
 		counter = collections.Counter(notNone)
-		print(counter.values())
 		for item in counter.values():
 			if item > 1:
 				addFitness = addFitness + 100000*(item - 1)
@@ -148,7 +148,22 @@ def repeatProf(chromosome):
 
 #(soft) adds to the fitness value for classes being schedules more than once per day
 def slotsOnSameDay(chromosome):
-	pass
+	addFitness = 0
+
+	for room in chromosome:
+		notNone = []
+		for timeslot in room.times:
+			if timeslot is not None:
+				notNone.append(timeslot)
+
+		counter = collections.Counter(notNone)
+		for item in counter.values():
+			if item > 1:
+				addFitness = addFitness + 100 * (item - 1)
+
+	return addFitness
+
+
 
 #returns a list of tuples, each being a mating pair of chromosomes, chromosomes are more likely to be selected for mating the lower their fitness value is
 def selection(population):
@@ -182,9 +197,6 @@ def selectOne(population):
 		if current > pick:
 			return chromosome
 
-
-
-
 #returns a child of two parent chromosomes, by selectings schedulings from each parent and acdding them to the child
 def crossover(parent1, parent2):
 	random.seed(datetime.now())
@@ -207,14 +219,10 @@ def crossover(parent1, parent2):
 				else:
 					childTimes[j] = parent2[i].times[j]
 
-
-				
-
 		childRoom = parent1[i]
 		childRoom.times = childTimes
 
 		child.append(childRoom)
-
 		
 	return child
 
