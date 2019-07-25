@@ -46,10 +46,10 @@ def main():
 	for room in rooms:
 		print(str(room.id) + "," + str(room.size))
 
-	rooms[0].times = [None,None,lectures[0],lectures[1],lectures[2]]
-	rooms[1].times = [None, lectures[0], None, lectures[0], lectures[0]]
-	chromosome = [rooms[0],rooms[1]]
-	print(duplicateLecture(chromosome))
+	rooms[4].times = [None,None,lectures[0],lectures[1],lectures[2]]
+	rooms[2].times = [None, lectures[0], None, lectures[0], lectures[6]]
+	chromosome = [rooms[4],rooms[2]]
+	print(classCapacityExceeded(chromosome))
 
 
 	#geneticAlgorithm(lectures,rooms,10,300)
@@ -94,7 +94,6 @@ def fitnessFunction(chromosome, lectures):
 def duplicateLecture(chromosome):
 	addFitness = 0
 
-	#for room1 in chromosome:
 	for i in range(len(chromosome[0].times)):
 		notNone = []
 		for room in chromosome:
@@ -105,22 +104,18 @@ def duplicateLecture(chromosome):
 		for item in counter.values():
 			if item > 1:
 				addFitness = addFitness + 100000*(item - 1)
-
-
-
 		
 	return addFitness
 
 #adds to the fitness value if a class is scheduled in a room that cant hold it
 def classCapacityExceeded(chromosome):
-	i = 0
-	j = 0
 	addFitness = 0
 		
-	for i in range(len(chromsome)):
-		for j in range(len(chromsome[i].times)):
-			if chromosome[i].size < chromosome[i].times[j].size:
-				addFitness = addFitness + 100000
+	for i in range(len(chromosome)):
+		for j in range(len(chromosome[i].times)):
+			if chromosome[i].times[j] is not None:
+				if chromosome[i].size < chromosome[i].times[j].size:
+					addFitness = addFitness + 100000
 			
 	return addFitness
 
