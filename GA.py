@@ -35,9 +35,9 @@ def getNextFreeTime(room):
 
 def initPopulation(rooms, lectures, popSize):
 	numLectures = len(lectures)
-	population = [0] #first element of chromsome is fitness value
+	population = []
 
-	while len(population) <= popSize: #use <= since the first element is not a chromosome
+	while len(population) < popSize:
 		tempRooms = copy.deepcopy(rooms) #gotta deep copy to avoid weird Python referencing issues
 		tempLectures = copy.deepcopy(lectures)
 
@@ -51,6 +51,7 @@ def initPopulation(rooms, lectures, popSize):
 				timeSlot = getNextFreeTime(tempRooms[randRoom])
 				tempRooms[randRoom].times[timeSlot] = randLec #add chosen lecture to random time slot
 
+		tempRooms.insert(0, 0) #add fitness value to start of chromosome
 		population.append(tempRooms) #tack new chromosome onto the end of the population list
 
 	return population
@@ -59,7 +60,7 @@ def printPopulation(population):
 	for chromosome in range(1, len(population)): #all chromosomes
 		print("Chromosome number " + str(chromosome))
 
-		for room in range(len(population[chromosome])):
+		for room in range(1, len(population[chromosome])):
 			print("Room number " + str(population[chromosome][room].id))
 
 			for time in range(len(population[chromosome][room].times)):
@@ -69,11 +70,12 @@ def printPopulation(population):
 				# 	print("Time slot number " + str(time) + ": " + "No lecture")
 			print("\n")
 		print("\n")
+
 def main():
 	fileString = sys.argv[1]
 	inputFile = open(fileString, "r")
-	lectures = [None]
-	rooms = [None]
+	lectures = []
+	rooms = []
 	readingRooms = False
 
 	for line in inputFile:
@@ -135,13 +137,13 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 	return population[0]
 
 #returns a fitness value, the closer to zero the more fit the chromosome
-def fitnessFunction(chromosome, lectures): 
+def fitnessFunction(chromosome, lectures):
 	fitness = 0
-	fitness = fitness + duplicateLecture(chromosome) 
-	fitness = fitnesss + classCapacityExceeded(chromosome) 
-	fitness = fitness + hoursAccurate(chromosome, lectures) 
-	fitness = fitness + repeatProf(chromosome) 
-	fitness = fitness + slotsOnSameDay(chromosome) 
+	fitness = fitness + duplicateLecture(chromosome)
+	fitness = fitnesss + classCapacityExceeded(chromosome)
+	fitness = fitness + hoursAccurate(chromosome, lectures)
+	fitness = fitness + repeatProf(chromosome)
+	fitness = fitness + slotsOnSameDay(chromosome)
 	return fitness
 
 #adds to the fitness value for classes scheduled in two rooms at the same time
@@ -158,19 +160,19 @@ def duplicateLecture(chromosome):
 		for item in counter.values():
 			if item > 1:
 				addFitness = addFitness + 100000*(item - 1)
-		
+
 	return addFitness
 
 #adds to the fitness value if a class is scheduled in a room that cant hold it
 def classCapacityExceeded(chromosome):
 	addFitness = 0
-		
+
 	for i in range(len(chromosome)):
 		for j in range(len(chromosome[i].times)):
 			if chromosome[i].times[j] is not None:
 				if chromosome[i].size < chromosome[i].times[j].size:
 					addFitness = addFitness + 100000
-			
+
 	return addFitness
 
 #adds to the fitness value if a lecture has too many or too few in a week
@@ -190,13 +192,13 @@ def hoursAccurate(chromosome, lectures):
 #(soft) adds to the fitness value for profs teaching in the same room two slots in a row
 def repeatProf(chromosome):
 	addFitness = 0
-		
+
 	for room in chromosome:
 		for i,j in enumerate(range(1,len(room.times))):
 			if room.times[i] is not None and room.times[j] is not None:
 				if room.times[i].prof == room.times[j].prof:
 					addFitness = addFitness + 100
-			
+
 	return addFitness
 
 #(soft) adds to the fitness value for classes being schedules more than once per day
