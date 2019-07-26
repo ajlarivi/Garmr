@@ -46,7 +46,7 @@ def main():
 	# for room in rooms:
 	# 	print(str(room.id) + "," + str(room.size))
 
-	solution = geneticAlgorithm(lectures,rooms,200,1000)
+	solution = geneticAlgorithm(lectures,rooms,100,500)
 	print("==============================================")
 	printSolution(solution)
 
@@ -61,7 +61,7 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 	random.seed(datetime.now())
 	population = initPopulation(rooms, lectures, popSize)
 	#printPopulation(population)
-
+	#printSolution(population[0])
 	for i in range(iterations):
 		random.shuffle(population)
 
@@ -86,8 +86,6 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 		print("fitness: " + str(population[0][0]))
 		if population[0][0] == 0:
 			break
-
-
 
 
 	return population[0]
@@ -116,7 +114,7 @@ def initPopulation(rooms, lectures, popSize):
 	return population
 
 def getRandom(list):
-	random.seed(datetime.now()) #seed random to avoid a pattern
+	#random.seed(datetime.now()) #seed random to avoid a pattern
 	return random.randint(0, len(list) - 1)
 
 def getNextFreeTime(room):
@@ -260,7 +258,7 @@ def selectOne(population):
 
 #returns a child of two parent chromosomes, by selectings schedulings from each parent and acdding them to the child
 def crossover(parent1, parent2, lectures):
-	random.seed(datetime.now())
+	#random.seed(datetime.now())
 	child = []
 
 	for i in range(1, len(parent1)):
@@ -293,10 +291,10 @@ def crossover(parent1, parent2, lectures):
 	return child
 
 def mutate(chromosome):
-	random.seed(datetime.now())
+	#random.seed(datetime.now())
 	randRoom = random.randint(1, len(chromosome) - 1)
 
-	random.seed(datetime.now())
+	#random.seed(datetime.now())
 	random.shuffle(chromosome[randRoom].times)
 	print("MUTATION")
 
