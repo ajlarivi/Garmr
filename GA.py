@@ -46,9 +46,9 @@ def main():
 	# for room in rooms:
 	# 	print(str(room.id) + "," + str(room.size))
 
-	solution = geneticAlgorithm(lectures,rooms,10,100)
+	solution = geneticAlgorithm(lectures,rooms,200,1000)
 	print("==============================================")
-	#printSolution(solution)
+	printSolution(solution)
 
 	#step 1: generate a population of chromosomes, each is an array of rooms
 	#step 2: run genetic algorithm
@@ -82,7 +82,11 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 			#print(str(chromosome[0]) + ", ", end='')
 			value = value + chromosome[0]
 		#print("]")
-		print("avg fitness: " + str(value/(len(population) + 1)))
+		print("avg fitness: " + str(value/(len(population) + 1)) + ", ", end='')
+		print("fitness: " + str(population[0][0]))
+		if population[0][0] == 0:
+			break
+
 
 
 
@@ -281,8 +285,23 @@ def crossover(parent1, parent2, lectures):
 
 		child.append(childRoom)
 
+	chance = random.randint(1,100)
+	if chance <= 3:
+		child = mutate(child)
+
 	child.insert(0, fitnessFunction(child, lectures))
 	return child
+
+def mutate(chromosome):
+	random.seed(datetime.now())
+	randRoom = random.randint(1, len(chromosome) - 1)
+
+	random.seed(datetime.now())
+	random.shuffle(chromosome[randRoom].times)
+	print("MUTATION")
+
+	return chromosome
+
 
 
 def printPopulation(population):
