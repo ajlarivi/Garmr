@@ -257,7 +257,7 @@ def selectOne(population):
 			return chromosome
 
 #returns a child of two parent chromosomes, by selectings schedulings from each parent and acdding them to the child
-def crossover(parent1, parent2, lectures):
+'''def crossover(parent1, parent2, lectures):
 	#random.seed(datetime.now())
 	child = []
 
@@ -281,11 +281,42 @@ def crossover(parent1, parent2, lectures):
 		childRoom = parent1[i]
 		childRoom.times = childTimes
 
+		chance = random.randint(1,1000)
+		if chance <= 3:
+			random.shuffle(childRoom.times)
+			print("MUTATION")
+
 		child.append(childRoom)
 
-	chance = random.randint(1,100)
-	if chance <= 3:
-		child = mutate(child)
+	#chance = random.randint(1,100)
+	#if chance <= 3:
+	#	child = mutate(child)
+
+	child.insert(0, fitnessFunction(child, lectures))
+	return child'''
+
+def crossover(parent1,parent2,lectures):
+	child = []
+	timesLength = len(parent1[1].times)
+
+	for i in range(1, len(parent1)):
+		childTimes = [None]*timesLength
+		
+		randIndex = random.randint(1, timesLength - 2)
+		for j in range(randIndex):
+			childTimes[j] = parent1[i].times[j]
+		for k in range(randIndex, timesLength - 1):
+			childTimes[k] = parent2[i].times[k]
+
+		childRoom = parent1[i]
+		childRoom.times = childTimes
+
+		chance = random.randint(1,1000)
+		if chance <= 3:
+			random.shuffle(childRoom.times)
+			print("MUTATION")
+
+		child.append(childRoom)
 
 	child.insert(0, fitnessFunction(child, lectures))
 	return child
