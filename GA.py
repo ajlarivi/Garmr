@@ -17,7 +17,7 @@ class Room:
 	def __init__(self, id, size):
 		self.id = id
 		self.size = size #capacity of the room
-		self.times = [None]*36 #array of time slots, each will contain a lecture object
+		self.times = [None]*35 #array of time slots, each will contain a lecture object
 
 def getRandom(list):
 	random.seed(datetime.now()) #seed random to avoid a pattern
@@ -72,8 +72,8 @@ def printPopulation(population):
 def main():
 	fileString = sys.argv[1]
 	inputFile = open(fileString, "r")
-	lectures = []
-	rooms = []
+	lectures = [None]
+	rooms = [None]
 	readingRooms = False
 
 	for line in inputFile:
@@ -216,8 +216,6 @@ def slotsOnSameDay(chromosome):
 
 	return addFitness
 
-
-
 #returns a list of tuples, each being a mating pair of chromosomes, chromosomes are more likely to be selected for mating the lower their fitness value is
 def selection(population):
 	popCopy = copy.deepCopy(population)
@@ -255,7 +253,7 @@ def crossover(parent1, parent2):
 	random.seed(datetime.now())
 	child = []
 
-	for i in range(len(parent1)):
+	for i in range(1, len(parent1)):
 		childTimes = [None]*35
 		for j in range(len(parent1[i].times)):
 			if parent1[i].times[j] is not None and parent2[i].times[j] is None:
