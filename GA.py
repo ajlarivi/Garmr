@@ -25,43 +25,37 @@ def main():
 	lectures = []
 	rooms = []
 	readingRooms = False
+	counter = -1
 
 	for line in inputFile:
+		counter = counter + 1
 
-		if line == "rooms\n":
+		if line == "rooms: id, size\n":
 			readingRooms = True
 			continue
 
 		line = line.strip("\n").split(",")
+
+		if counter == 0:
+			populationSize = int(line[0])
+			maxIterations = int(line[1])
+			continue
+		if counter == 1:
+			continue
 
 		if not readingRooms:
 			lectures.append(Lecture(int(line[0]),int(line[1]),int(line[2]),int(line[3])))
 		else:
 			rooms.append(Room(int(line[0]),int(line[1])))
 
-	# print("Lectures")
-	# for lecture in lectures:
-	# 	print(str(lecture.id) + "," + str(lecture.prof) + "," + str(lecture.hours) + "," + str(lecture.size))
-	# print("rooms")
-	# for room in rooms:
-	# 	print(str(room.id) + "," + str(room.size))
-
-	solution = geneticAlgorithm(lectures,rooms,100,500)
-	print("==============================================")
+	solution = geneticAlgorithm(lectures,rooms,populationSize,maxIterations)
 	printSolution(solution)
 
-	#step 1: generate a population of chromosomes, each is an array of rooms
-	#step 2: run genetic algorithm
-		#step 2.1: run fitness function on each chromosome
-		#step 2.2: select chromosomes for reproduction and cross over
-		#step 2.3: repeat on offspring
-	#step 3: display result in human readable way (print out chromosome somehow)
 
 def geneticAlgorithm(lectures, rooms, popSize, iterations):
 	random.seed(datetime.now())
 	population = initPopulation(rooms, lectures, popSize)
-	#printPopulation(population)
-	#printSolution(population[0])
+
 	for i in range(iterations):
 		random.shuffle(population)
 
@@ -76,17 +70,17 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 		population = population[:popSize]
 
 
-		value = 0
-		#print("[", end='')
+		sumFitness = 0
 		for chromosome in population:
-			#print(str(chromosome[0]) + ", ", end='')
-			value = value + chromosome[0]
-		#print("]")
-		print("avg fitness: " + str(value/(len(population) + 1)) + ", ", end='')
-		print("fitness: " + str(population[0][0]))
+			sumFitness = sumFitness + chromosome[0]
+		print("iteration: " + str(i+1) + ", avg fitness: " + str(value/(len(population) + 1)) + ", top fitness: " + str(population[0][0]))
+		#print(str(i) + "," + str(population[0][0]) + "," + str(value/(len(population) + 1)))
 		if population[0][0] == 0:
 			break
 
+	print("==============================================")
+	print("iterations: " + str(i + 1))
+	print("==============================================")
 
 	return population[0]
 
@@ -114,7 +108,6 @@ def initPopulation(rooms, lectures, popSize):
 	return population
 
 def getRandom(list):
-	#random.seed(datetime.now()) #seed random to avoid a pattern
 	return random.randint(0, len(list) - 1)
 
 def getNextFreeTime(room):
@@ -188,7 +181,7 @@ def hoursAccurate(chromosome, lectures):
 
 	return addFitness
 
-#(soft) adds to the fitness value for profs teaching in the same room two slots in a row
+#(soft constraint) adds to the fitness value for profs teaching in the same room two slots in a row
 def repeatProf(chromosome):
 	addFitness = 0
 
@@ -203,7 +196,7 @@ def repeatProf(chromosome):
 
 	return addFitness
 
-#(soft) adds to the fitness value for classes being schedules more than once per day
+#(soft constraint) adds to the fitness value for classes being schedules more than once per day
 def slotsOnSameDay(chromosome):
 	addFitness = 0
 
@@ -257,44 +250,6 @@ def selectOne(population):
 			return chromosome
 
 #returns a child of two parent chromosomes, by selectings schedulings from each parent and acdding them to the child
-'''def crossover(parent1, parent2, lectures):
-	#random.seed(datetime.now())
-	child = []
-
-	for i in range(1, len(parent1)):
-		childTimes = [None]*35
-		for j in range(len(parent1[i].times)):
-			if parent1[i].times[j] is not None and parent2[i].times[j] is None:
-				childTimes[j] = parent1[i].times[j]
-
-			if parent1[i].times[j] is None and parent2[i].times[j] is not None:
-				childTimes[j] = parent2[i].times[j]
-
-			if parent1[i].times[j] is not None and parent2[i].times[j] is not None:
-
-				chance = random.randint(1,100)
-				if chance <= 50:
-					childTimes[j] = parent1[i].times[j]
-				else:
-					childTimes[j] = parent2[i].times[j]
-
-		childRoom = parent1[i]
-		childRoom.times = childTimes
-
-		chance = random.randint(1,1000)
-		if chance <= 3:
-			random.shuffle(childRoom.times)
-			print("MUTATION")
-
-		child.append(childRoom)
-
-	#chance = random.randint(1,100)
-	#if chance <= 3:
-	#	child = mutate(child)
-
-	child.insert(0, fitnessFunction(child, lectures))
-	return child'''
-
 def crossover(parent1,parent2,lectures):
 	child = []
 	timesLength = len(parent1[1].times)
@@ -303,10 +258,7 @@ def crossover(parent1,parent2,lectures):
 		childTimes = [None]*timesLength
 		
 		randIndex = random.randint(1, timesLength - 2)
-		for j in range(randIndex):
-			childTimes[j] = parent1[i].times[j]
-		for k in range(randIndex, timesLength - 1):
-			childTimes[k] = parent2[i].times[k]
+		childTimes = parent1[i].times[:randIndex] + parent2[i].times[randIndex:]
 
 		childRoom = parent1[i]
 		childRoom.times = childTimes
@@ -314,39 +266,12 @@ def crossover(parent1,parent2,lectures):
 		chance = random.randint(1,1000)
 		if chance <= 3:
 			random.shuffle(childRoom.times)
-			print("MUTATION")
 
 		child.append(childRoom)
 
 	child.insert(0, fitnessFunction(child, lectures))
+
 	return child
-
-def mutate(chromosome):
-	#random.seed(datetime.now())
-	randRoom = random.randint(1, len(chromosome) - 1)
-
-	#random.seed(datetime.now())
-	random.shuffle(chromosome[randRoom].times)
-	print("MUTATION")
-
-	return chromosome
-
-
-
-def printPopulation(population):
-	for chromosome in range(1, len(population)): #all chromosomes
-		print("Chromosome number " + str(chromosome))
-
-		for room in range(1, len(population[chromosome])):
-			print("Room number " + str(population[chromosome][room].id))
-
-			for time in range(len(population[chromosome][room].times)):
-				if population[chromosome][room].times[time] is not None:
-					print("Time slot number " + str(time) + ": " + str(population[chromosome][room].times[time].id)) #big fan of this chaining
-				# else:
-				# 	print("Time slot number " + str(time) + ": " + "No lecture")
-			print("\n")
-		print("\n")
 
 def printSolution(chromosome):
 	for room in range(1, len(chromosome)):
@@ -360,7 +285,6 @@ def printSolution(chromosome):
 		print("\n")
 	print("\n")
 	print("solution fitness: " + str(chromosome[0]))
-
 
 if __name__ == '__main__':
 	main()
