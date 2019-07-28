@@ -1,3 +1,4 @@
+populationSize,maxIterations
 100,500
 Lectures: id, prof, hours, size
 1,1,3,37

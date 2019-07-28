@@ -37,11 +37,11 @@ def main():
 
 		line = line.strip("\n").split(",") #splice via commas and trim of the trailing newline
 
-		if counter == 0: #set GA paramenters from first line of file
+		if counter == 1: #set GA paramenters from first line of file
 			populationSize = int(line[0])
 			maxIterations = int(line[1])
 			continue
-		if counter == 1: #skip "lectures" line
+		if counter == 0 or counter == 2: #skip info lines
 			continue
 
 		if not readingRooms: 
