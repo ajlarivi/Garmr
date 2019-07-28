@@ -15,7 +15,7 @@ class Lecture:
 
 class Room:
 	def __init__(self, id, size):
-		self.id = id
+		self.id = id #id of the room
 		self.size = size #capacity of the room
 		self.times = [None]*35 #array of time slots, each will contain a lecture object
 
@@ -27,63 +27,68 @@ def main():
 	readingRooms = False
 	counter = -1
 
+	#start by reading the input file
 	for line in inputFile:
 		counter = counter + 1
 
-		if line == "rooms: id, size\n":
+		if line == "rooms: id, size\n": #check if we have started reading room inputs
 			readingRooms = True
 			continue
 
-		line = line.strip("\n").split(",")
+		line = line.strip("\n").split(",") #splice via commas and trim of the trailing newline
 
-		if counter == 0:
+		if counter == 0: #set GA paramenters from first line of file
 			populationSize = int(line[0])
 			maxIterations = int(line[1])
 			continue
-		if counter == 1:
+		if counter == 1: #skip "lectures" line
 			continue
 
-		if not readingRooms:
-			lectures.append(Lecture(int(line[0]),int(line[1]),int(line[2]),int(line[3])))
+		if not readingRooms: 
+			lectures.append(Lecture(int(line[0]),int(line[1]),int(line[2]),int(line[3]))) #create lecture object from input and append to list of lectures
 		else:
-			rooms.append(Room(int(line[0]),int(line[1])))
+			rooms.append(Room(int(line[0]),int(line[1]))) #create room object from input and append to list of lectures
 
-	solution = geneticAlgorithm(lectures,rooms,populationSize,maxIterations)
-	printSolution(solution)
+	solution = geneticAlgorithm(lectures,rooms,populationSize,maxIterations) #run genetic algorithm
+
+	printSolution(solution) 
 
 
 def geneticAlgorithm(lectures, rooms, popSize, iterations):
-	random.seed(datetime.now())
+	random.seed(datetime.now()) #seed random to prevent patters arising
 	population = initPopulation(rooms, lectures, popSize)
 
-	for i in range(iterations):
-		random.shuffle(population)
+	for i in range(iterations): #repeat for a maximum of the "iterations" parameter
+		random.shuffle(population) #randomly shuffle the population, helps ensure random selection
 
-		for chromosome in population:
-			chromosome[0] = fitnessFunction(chromosome, lectures)
+		for chromosome in population: 
+			chromosome[0] = fitnessFunction(chromosome, lectures) #evaluate the fitness of each individual in the population
 
-		selected = selection(population)
+		selected = selection(population) #select mating pairs within the population
+
 		for pair in selected:
-			population.append(crossover(pair[0], pair[1], lectures))
+			population.append(crossover(pair[0], pair[1], lectures)) #add children of mating pairs to the population
 
-		population.sort(key=lambda x: x[0], reverse=False)
-		population = population[:popSize]
+		population.sort(key=lambda x: x[0], reverse=False) #sort population from lowest (best) fitness to highest (worst)
+		population = population[:popSize] #trim population down to initial size (removes "least fit" individuals)
 
 
 		sumFitness = 0
 		for chromosome in population:
 			sumFitness = sumFitness + chromosome[0]
-		print("iteration: " + str(i+1) + ", avg fitness: " + str(value/(len(population) + 1)) + ", top fitness: " + str(population[0][0]))
-		#print(str(i) + "," + str(population[0][0]) + "," + str(value/(len(population) + 1)))
+		print("iteration: " + str(i+1) + ", avg fitness: " + str(sumFitness/(len(population) + 1)) + ", top fitness: " + str(population[0][0]))
+		#print(str(i) + "," + str(population[0][0]) + "," + str(sumFitness/(len(population) + 1)))
+
 		if population[0][0] == 0:
-			break
+			break #if an individual has a fitness of zero we have found an ideal solution, algorithm can terminate 
 
 	print("==============================================")
 	print("iterations: " + str(i + 1))
 	print("==============================================")
 
-	return population[0]
+	return population[0] #returns the first element of the population list, the "most fit" individual
 
+#randomly generates an initial population of chromosomes of size popSize
 def initPopulation(rooms, lectures, popSize):
 	numLectures = len(lectures)
 	population = []
@@ -130,7 +135,7 @@ def fitnessFunction(chromosome, lectures):
 	fitness = fitness + slotsOnSameDay(chromosome)
 	return fitness
 
-#adds to the fitness value for classes scheduled in two rooms at the same time
+#adds to the fitness value for classes scheduled in two or more rooms at the same time
 def duplicateLecture(chromosome):
 	addFitness = 0
 
@@ -138,15 +143,15 @@ def duplicateLecture(chromosome):
 		notNone = []
 
 		iterChromosome = iter(chromosome)
-		next(iterChromosome)
+		next(iterChromosome) #skip first element of chromosome (fitness value)
 
 		for room in iterChromosome:
-			if room.times[i] is not None:
+			if room.times[i] is not None: #create list of non-null lectures in a given timeslot across all rooms
 				notNone.append(room.times[i].id)
 
-		counter = collections.Counter(notNone)
+		counter = collections.Counter(notNone) #count repititions of lectures  
 		for item in counter.values():
-			if item > 1:
+			if item > 1: #if lecture is repeated, add to the fitness value
 				addFitness = addFitness + 100000*(item - 1)
 
 	return addFitness
@@ -167,17 +172,17 @@ def classCapacityExceeded(chromosome):
 def hoursAccurate(chromosome, lectures):
 	addFitness = 0
 
-	for lecture in lectures:
+	for lecture in lectures: #loop through all lectures
 		totalTime = 0
 
 		iterChromosome = iter(chromosome)
-		next(iterChromosome)
+		next(iterChromosome) #skip first element of chromosome (fitness value)
 
 		for room in iterChromosome:
 			for timeslot in room.times:
 				if timeslot is not None and timeslot.id == lecture.id:
 					totalTime = totalTime + 1
-		addFitness = addFitness + abs(lecture.hours - totalTime) * 1000
+		addFitness = addFitness + abs(lecture.hours - totalTime) * 1000 #add to fitness value for each hour missing or exceeded for a given lecture
 
 	return addFitness
 
@@ -186,10 +191,10 @@ def repeatProf(chromosome):
 	addFitness = 0
 
 	iterChromosome = iter(chromosome)
-	next(iterChromosome)
+	next(iterChromosome) #skip first element of chromosome (fitness value)
 
 	for room in iterChromosome:
-		for i,j in enumerate(range(1,len(room.times))):
+		for i,j in enumerate(range(1,len(room.times))): #move through the list two at a time
 			if room.times[i] is not None and room.times[j] is not None:
 				if room.times[i].prof == room.times[j].prof:
 					addFitness = addFitness + 100
@@ -201,45 +206,46 @@ def slotsOnSameDay(chromosome):
 	addFitness = 0
 
 	iterChromosome = iter(chromosome)
-	next(iterChromosome)
+	next(iterChromosome) #skip first element of chromosome (fitness value)
 
 	for room in iterChromosome:
 		notNone = []
 		for timeslot in room.times:
-			if timeslot is not None:
+			if timeslot is not None: #create list of non-null lectures scheduled in a given room
 				notNone.append(timeslot)
 
-		counter = collections.Counter(notNone)
+		counter = collections.Counter(notNone) #count repitions of non-null lectures
 		for item in counter.values():
 			if item > 1:
-				addFitness = addFitness + 100 * (item - 1)
+				addFitness = addFitness + 100 * (item - 1) #add to fitness for each identical lecture on the same day
 
 	return addFitness
 
 #returns a list of tuples, each being a mating pair of chromosomes, chromosomes are more likely to be selected for mating the lower their fitness value is
 def selection(population):
-	popCopy = copy.deepcopy(population)
-	numPairs = int(math.ceil(len(popCopy)/4))
+	popCopy = copy.deepcopy(population) #dont want to be modifying actual population
+	numPairs = int(math.ceil(len(popCopy)/4)) #only half the population gets selected as parents 
 	matingPairs = []
 
 	maxFitness = 0
 	for chromosome in popCopy:
 		if chromosome[0] > maxFitness:
-			maxFitness = chromosome[0]
+			maxFitness = chromosome[0] #find the highest fitness value in the population
 
 	for chromosome in popCopy:
-		chromosome[0] = 1.1 - (chromosome[0]/maxFitness)
+		chromosome[0] = 1.1 - (chromosome[0]/maxFitness) #translate fitness value into a value between 0.1 and 1.1 (higher is now better)
 
 	for i in range(numPairs):
-		chromosone1 = selectOne(popCopy)
+		chromosone1 = selectIndividual(popCopy) #first parent
 		popCopy.remove(chromosone1)
-		chromosome2 = selectOne(popCopy)
+		chromosome2 = selectIndividual(popCopy) #second parent
 		popCopy.remove(chromosome2)
-		matingPairs.append((chromosone1,chromosome2))
+		matingPairs.append((chromosone1,chromosome2)) #add tuple of mated pair to list
 
 	return matingPairs
 
-def selectOne(population):
+#selects an individual from a population using a weighted random chance. The higher an individuals adjusted fitness, the more likely it is to be selected
+def selectIndividual(population):
 	maxRange = sum([chromosome[0] for chromosome in population])
 	pick = random.uniform(0, maxRange)
 	current = 0
@@ -255,24 +261,23 @@ def crossover(parent1,parent2,lectures):
 	timesLength = len(parent1[1].times)
 
 	for i in range(1, len(parent1)):
-		childTimes = [None]*timesLength
-		
-		randIndex = random.randint(1, timesLength - 2)
-		childTimes = parent1[i].times[:randIndex] + parent2[i].times[randIndex:]
+		randIndex = random.randint(1, timesLength - 2) #pick a random index between 1 and the second last list entry
+		childTimes = parent1[i].times[:randIndex] + parent2[i].times[randIndex:] #splice the times array of each parent about randIndex (acheives crossover)
 
-		childRoom = parent1[i]
-		childRoom.times = childTimes
+		childRoom = Room(parent1[i].id, parent1[i].size) #create new childRoom that is a copy of the parent (same id and size)
+		childRoom.times = childTimes #assingn the spliced times array to the child room
 
 		chance = random.randint(1,1000)
-		if chance <= 3:
-			random.shuffle(childRoom.times)
+		if chance <= 3: #0.003% chance of each room mutating
+			random.shuffle(childRoom.times) #rearrange the timeslots of the mutated room
 
-		child.append(childRoom)
+		child.append(childRoom) #add the room to the child chromosome
 
-	child.insert(0, fitnessFunction(child, lectures))
+	child.insert(0, fitnessFunction(child, lectures)) #evaluate the fitness of the child chromosome and add this value to the first element of the list
 
 	return child
 
+#prints a single chromosome in a human readable form
 def printSolution(chromosome):
 	for room in range(1, len(chromosome)):
 		print("Room number " + str(chromosome[room].id))

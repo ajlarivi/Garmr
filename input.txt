@@ -1,4 +1,4 @@
-200,500
+100,1000
 Lectures: id, prof, hours, size
 1,1,3,37
 2,1,1,40
