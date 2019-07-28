@@ -49,14 +49,17 @@ def main():
 		else:
 			rooms.append(Room(int(line[0]),int(line[1]))) #create room object from input and append to list of lectures
 
-	solution = geneticAlgorithm(lectures,rooms,populationSize,maxIterations) #run genetic algorithm
+	solution, terminationType, actualIterations = geneticAlgorithm(lectures,rooms,populationSize,maxIterations) #run genetic algorithm
 
-	printSolution(solution) 
+	printSolution(solution, terminationType, actualIterations) 
 
 
 def geneticAlgorithm(lectures, rooms, popSize, iterations):
 	random.seed(datetime.now()) #seed random to prevent patters arising
 	population = initPopulation(rooms, lectures, popSize)
+	terminationValue = None
+	terminationCounter = 0
+	terminationType = 0
 
 	for i in range(iterations): #repeat for a maximum of the "iterations" parameter
 		random.shuffle(population) #randomly shuffle the population, helps ensure random selection
@@ -76,17 +79,28 @@ def geneticAlgorithm(lectures, rooms, popSize, iterations):
 		sumFitness = 0
 		for chromosome in population:
 			sumFitness = sumFitness + chromosome[0]
-		print("iteration: " + str(i+1) + ", avg fitness: " + str(sumFitness/(len(population) + 1)) + ", top fitness: " + str(population[0][0]))
+
+		avgFitness = sumFitness/(len(population) + 1)
+		topFitness = population[0][0]
+		print("iteration: " + str(i+1) + ", avg fitness: " + str(avgFitness) + ", top fitness: " + str(topFitness))
 		#print(str(i) + "," + str(population[0][0]) + "," + str(sumFitness/(len(population) + 1)))
 
-		if population[0][0] == 0:
-			break #if an individual has a fitness of zero we have found an ideal solution, algorithm can terminate 
+		if terminationValue is None or terminationValue == topFitness:
+			terminationCounter = terminationCounter + 1
+		else:
+			terminationCounter = 0
 
-	print("==============================================")
-	print("iterations: " + str(i + 1))
-	print("==============================================")
+		terminationValue = topFitness
 
-	return population[0] #returns the first element of the population list, the "most fit" individual
+		if topFitness == 0: #if an individual has a fitness of zero we have found an ideal solution, algorithm can terminate
+			terminationType = 1
+			break 
+
+		if terminationCounter > int(iterations/4): #if the top fitness hasnt changed for 1/4 of max iterations, the algorithm can be considered stuck and can terminate
+			terminationType = 2
+			break  
+
+	return population[0], terminationType, i+1 #returns (the "most fit" individual, reason for termination, number of iterations)
 
 #randomly generates an initial population of chromosomes of size popSize
 def initPopulation(rooms, lectures, popSize):
@@ -267,8 +281,8 @@ def crossover(parent1,parent2,lectures):
 		childRoom = Room(parent1[i].id, parent1[i].size) #create new childRoom that is a copy of the parent (same id and size)
 		childRoom.times = childTimes #assingn the spliced times array to the child room
 
-		chance = random.randint(1,1000)
-		if chance <= 3: #0.003% chance of each room mutating
+		chance = random.randint(1,100)
+		if chance <= 1: #1% chance of each room mutating
 			random.shuffle(childRoom.times) #rearrange the timeslots of the mutated room
 
 		child.append(childRoom) #add the room to the child chromosome
@@ -278,7 +292,7 @@ def crossover(parent1,parent2,lectures):
 	return child
 
 #prints a single chromosome in a human readable form
-def printSolution(chromosome):
+def printSolution(chromosome, terminationType, actualIterations):
 	for room in range(1, len(chromosome)):
 		print("Room number " + str(chromosome[room].id))
 
@@ -289,7 +303,18 @@ def printSolution(chromosome):
 				print("Time slot number " + str(time) + ": " + "No lecture")
 		print("\n")
 	print("\n")
-	print("solution fitness: " + str(chromosome[0]))
+
+	print("==============================================")
+	print("solution fitness:\t" + str(chromosome[0]))
+	print("reason for termination:\t", end='')
+	if terminationType == 0:
+		print("maximum iterations completed")
+	elif terminationType == 1:
+		print("ideal solution found")
+	else:
+		print("fitness no longer improving, algorithm cannot optimise any further")
+	print("iterations completed:\t" + str(actualIterations))
+	print("==============================================")
 
 if __name__ == '__main__':
 	main()
