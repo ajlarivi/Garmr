@@ -142,7 +142,7 @@ def getNextFreeTime(room):
 #returns a fitness value, the closer to zero the more fit the chromosome
 def fitnessFunction(chromosome, lectures):
 	fitness = 0
-	fitness = fitness + duplicateLecture(chromosome)
+	fitness = fitness + duplicateLectureOrProf(chromosome)
 	fitness = fitness + classCapacityExceeded(chromosome)
 	fitness = fitness + hoursAccurate(chromosome, lectures)
 	fitness = fitness + repeatProf(chromosome)
@@ -150,23 +150,30 @@ def fitnessFunction(chromosome, lectures):
 	return fitness
 
 #adds to the fitness value for classes scheduled in two or more rooms at the same time
-def duplicateLecture(chromosome):
+def duplicateLectureOrProf(chromosome):
 	addFitness = 0
 
 	for i in range(len(chromosome[1].times)):
-		notNone = []
+		notNoneRooms = []
+		notNoneProfs = []
 
 		iterChromosome = iter(chromosome)
 		next(iterChromosome) #skip first element of chromosome (fitness value)
 
 		for room in iterChromosome:
-			if room.times[i] is not None: #create list of non-null lectures in a given timeslot across all rooms
-				notNone.append(room.times[i].id)
+			if room.times[i] is not None: #create list of non-null lectures and the profs who teach them in a given timeslot across all rooms
+				notNoneRooms.append(room.times[i].id)
+				notNoneProfs.append(room.times[i].prof)
 
-		counter = collections.Counter(notNone) #count repititions of lectures  
-		for item in counter.values():
+		counterLectures = collections.Counter(notNoneRooms) #count repititions of lectures
+		counterProfs = collections.Counter(notNoneProfs) #count repititions of profs
+
+		for item in counterLectures.values():
 			if item > 1: #if lecture is repeated, add to the fitness value
 				addFitness = addFitness + 100000*(item - 1)
+
+		for item in counterProfs.values(): #if a prof is repeated, add to the fitness value
+			addFitness = addFitness + 100000*(item - 1)
 
 	return addFitness
 
